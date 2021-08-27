@@ -31,6 +31,59 @@ nb_path: "01_generate_training_set.ipynb"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">chess.pgn</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">mediocre_chess_ai.state</span> <span class="kn">import</span> <span class="n">State</span>
+
+
+<span class="k">def</span> <span class="nf">get_dataset</span><span class="p">(</span><span class="n">num_samples</span><span class="p">):</span>
+    <span class="c1"># Initialize variables for storing board states and results.</span>
+    <span class="n">X</span><span class="p">,</span><span class="n">Y</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="n">gn</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="c1"># Value from each match depending on outcome.</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;1/2-1/2&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;0-1&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;1-0&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+    
+    <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">):</span>
+        <span class="c1"># pgn files in this data folder</span>
+        <span class="n">pgn</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">fn</span><span class="p">))</span>
+        <span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">game</span> <span class="o">=</span> <span class="n">chess</span><span class="o">.</span><span class="n">pgn</span><span class="o">.</span><span class="n">read_game</span><span class="p">(</span><span class="n">pgn</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">game</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">break</span>  
+            <span class="c1"># Gets the result from the game.</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;Result&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">res</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span> 
+                <span class="k">continue</span>   
+            <span class="n">value</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="n">res</span><span class="p">]</span>
+            
+            <span class="c1"># Plays the next move .</span>
+            <span class="n">board</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">board</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">move</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">game</span><span class="o">.</span><span class="n">mainline_moves</span><span class="p">()):</span>
+                <span class="n">board</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">move</span><span class="p">)</span>
+                <span class="n">ser</span> <span class="o">=</span> <span class="n">State</span><span class="p">(</span><span class="n">board</span><span class="p">)</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
+                <span class="n">X</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ser</span><span class="p">)</span>
+                <span class="n">Y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;parsing game </span><span class="si">%d</span><span class="s2">, got </span><span class="si">%d</span><span class="s2"> examples&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">gn</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)))</span>
+            
+            <span class="c1"># Cancel if we got enough examples.</span>
+            <span class="k">if</span> <span class="n">num_samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">num_samples</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">X</span><span class="p">,</span><span class="n">Y</span>
+            <span class="n">gn</span> <span class="o">+=</span><span class="mi">1</span>
+    <span class="c1"># Convert to numpy arrays</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span><span class="n">Y</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
 
 </div>
     {% endraw %}

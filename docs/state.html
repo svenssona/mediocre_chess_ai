@@ -31,6 +31,80 @@ nb_path: "00_state.ipynb"
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">chess</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<span class="k">class</span> <span class="nc">State</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">board</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">board</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">board</span> <span class="o">=</span> <span class="n">chess</span><span class="o">.</span><span class="n">Board</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">board</span> <span class="o">=</span> <span class="n">board</span>
+
+    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;numericalize current board states&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span>
+        
+        <span class="c1"># Init board state.</span>
+        <span class="n">bstate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">64</span><span class="p">):</span>
+            <span class="n">pp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">piece_at</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Assigns a value representing the pieces (capitalized letters are white pieces).</span>
+                <span class="n">bstate</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;P&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;Q&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> \
+                             <span class="s2">&quot;p&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="s2">&quot;q&quot;</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">:</span> <span class="mi">14</span><span class="p">}[</span><span class="n">pp</span><span class="o">.</span><span class="n">symbol</span><span class="p">()]</span> <span class="c1"># lowercase black</span>
+                
+        <span class="c1"># Special board states 7,8 and 15.</span>
+        <span class="c1"># Determine if we can castle on white.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">has_queenside_castling_rights</span><span class="p">(</span><span class="n">chess</span><span class="o">.</span><span class="n">WHITE</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">bstate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span>
+            <span class="n">bstate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">has_kingside_castling_rights</span><span class="p">(</span><span class="n">chess</span><span class="o">.</span><span class="n">WHITE</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">bstate</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span>
+            <span class="n">bstate</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">7</span> 
+            
+        <span class="c1"># Determine if we can castle on black.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">has_queenside_castling_rights</span><span class="p">(</span><span class="n">chess</span><span class="o">.</span><span class="n">BLACK</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">bstate</span><span class="p">[</span><span class="mi">56</span><span class="p">]</span> <span class="o">==</span> <span class="mi">12</span>
+            <span class="n">bstate</span><span class="p">[</span><span class="mi">56</span><span class="p">]</span> <span class="o">=</span> <span class="mi">15</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">has_kingside_castling_rights</span><span class="p">(</span><span class="n">chess</span><span class="o">.</span><span class="n">BLACK</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">bstate</span><span class="p">[</span><span class="mi">63</span><span class="p">]</span> <span class="o">==</span> <span class="mi">12</span>
+            <span class="n">bstate</span><span class="p">[</span><span class="mi">63</span><span class="p">]</span> <span class="o">=</span> <span class="mi">15</span> 
+            
+        <span class="c1"># Gives the potential en passant square.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">ep_square</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">bstate</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">ep_square</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="n">bstate</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">ep_square</span><span class="p">]</span> <span class="o">=</span> <span class="mi">8</span>    
+        
+        <span class="c1"># Reshapes the board state to a matrix.</span>
+        <span class="n">bstate</span> <span class="o">=</span> <span class="n">bstate</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">)</span>
+        
+        <span class="c1"># 320 bits according to readme.</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        
+        <span class="c1"># 0-3 to binary.</span>
+        <span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">bstate</span><span class="o">&gt;&gt;</span><span class="mi">3</span><span class="p">)</span><span class="o">&amp;</span><span class="mi">1</span>
+        <span class="n">state</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">bstate</span><span class="o">&gt;&gt;</span><span class="mi">2</span><span class="p">)</span><span class="o">&amp;</span><span class="mi">1</span>
+        <span class="n">state</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">bstate</span><span class="o">&gt;&gt;</span><span class="mi">1</span><span class="p">)</span><span class="o">&amp;</span><span class="mi">1</span>
+        <span class="n">state</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">bstate</span><span class="o">&gt;&gt;</span><span class="mi">0</span><span class="p">)</span><span class="o">&amp;</span><span class="mi">1</span>
+        
+        <span class="c1"># 4th column is who&#39;s turn it is.</span>
+        <span class="n">state</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">turn</span><span class="o">*</span><span class="mf">1.0</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">state</span>
+
+    <span class="k">def</span> <span class="nf">edges</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">legal_moves</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
 
 </div>
     {% endraw %}
