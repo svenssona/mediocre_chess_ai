@@ -14,9 +14,13 @@ TODOs
 - [x] Train on more data
 - [] Add RL self learning support
 
+```python
+display(chess.Board())
 ```
-chess.svg.board(board=chess.Board(), size=350)
-```
+
+
+![svg](docs/images/output_1_0.svg)
+
 
 ## Implementation
 
