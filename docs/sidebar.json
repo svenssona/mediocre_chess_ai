@@ -1,0 +1,9 @@
+{
+  "mediocre_chess_ai": {
+    "Overview": "/",
+    "State": "/state",
+    "Generate Training Set": "/generate_training_set",
+    "Hemmaplan": "/train",
+    "Playing Chess ": "/play"
+  }
+}
