@@ -7,16 +7,12 @@ https://youtu.be/RFaFmkCEGEs
 
 ---
 TODOs
-- [] Establish nbdev
+- [x] Establish nbdev
 - [x] Build dataset and generate data.
 - [x] Establish a neural network
 - [] Roll out search beyond 1 move
 - [x] Train on more data
 - [] Add RL self learning support
-
-```python
-display(chess.Board())
-```
 
 
 ![svg](docs/images/output_1_0.svg)
