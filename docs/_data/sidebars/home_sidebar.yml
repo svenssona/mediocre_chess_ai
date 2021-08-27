@@ -11,16 +11,16 @@ entries:
       url: /
     - output: web,pdf
       title: State
-      url: state.html
+      url: /state
     - output: web,pdf
       title: Generate Training Set
-      url: generate_training_set.html
+      url: /generate_training_set
     - output: web,pdf
       title: Hemmaplan
-      url: train.html
+      url: /train
     - output: web,pdf
       title: 'Playing Chess '
-      url: play.html
+      url: /play
     output: web
     title: mediocre_chess_ai
   output: web

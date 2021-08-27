@@ -1,4 +1,3 @@
-
 # Mediocre Neural Network Chess AI
 > Building a chess engine using neural networks and nbdev :)
 
