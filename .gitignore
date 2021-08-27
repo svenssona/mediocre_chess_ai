@@ -18,6 +18,10 @@ __pycache__/
 # C extensions
 *.so
 
+# data
+data
+processed/
+
 # Distribution / packaging
 .Python
 env/
