@@ -2,23 +2,22 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"State": "00_State.ipynb",
-         "get_dataset": "00_State.ipynb",
-         "ChessValueDataset": "00_State.ipynb",
-         "chess_dataset": "00_State.ipynb",
-         "train_loader": "00_State.ipynb",
-         "Valuator": "00_State.ipynb",
-         "explore_leaves": "00_State.ipynb",
-         "computer_move": "00_State.ipynb",
-         "move": "00_State.ipynb",
-         "s": "00_State.ipynb",
-         "v": "00_State.ipynb",
-         "quit": "00_State.ipynb"}
+index = {"State": "00_state.ipynb",
+         "get_dataset": "01_generate_training_set.ipynb",
+         "ChessValueDataset": "02_train.ipynb",
+         "Net": "02_train.ipynb",
+         "Valuator": "03_play.ipynb",
+         "explore_leaves": "03_play.ipynb",
+         "computer_move": "03_play.ipynb",
+         "move": "03_play.ipynb"}
 
-modules = ["core.py"]
+modules = ["state.py",
+           "generate_training_set.py",
+           "train.py",
+           "play.py"]
 
 doc_url = "https://svenssona.github.io/mediocre_chess_ai/"
 
-git_url = "https://github.com/svenssona/mediocre_chess_ai/tree/{branch}/"
+git_url = "https://github.com/svenssona/mediocre_chess_ai/tree/master/"
 
 def custom_doc_links(name): return None
