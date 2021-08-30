@@ -7,9 +7,12 @@ index = {"State": "00_state.ipynb",
          "ChessValueDataset": "02_train.ipynb",
          "Net": "02_train.ipynb",
          "Valuator": "03_play.ipynb",
+         "ClassicValuator": "03_play.ipynb",
+         "MAXVAL": "03_play.ipynb",
          "explore_leaves": "03_play.ipynb",
          "computer_move": "03_play.ipynb",
-         "move": "03_play.ipynb"}
+         "move": "03_play.ipynb",
+         "computer_minimax": "03_play.ipynb"}
 
 modules = ["state.py",
            "generate_training_set.py",
